@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ResourceType {
+  COURSE
+  ARTICLE
+  VIDEO
+}
+
+model User {
+  id           String     @id @default(uuid())
+  email        String     @unique
+  passwordHash String?    // null if user signed up via Google OAuth
+  googleId     String?    @unique
+  name         String
+  createdAt    DateTime   @default(now())
+  ratings      Rating[]
+  resources    Resource[] @relation("CreatedResources")
+}
+
+model Resource {
+  id          String       @id @default(uuid())
+  title       String
+  url         String
+  type        ResourceType
+  tags        String[]     // e.g. ["javascript", "backend"]
+  createdById String
+  createdBy   User         @relation("CreatedResources", fields: [createdById], references: [id])
+  createdAt   DateTime     @default(now())
+  ratings     Rating[]
+
+  @@index([tags])
+}
+
+model Rating {
+  id         String   @id @default(uuid())
+  userId     String
+  resourceId String
+  score      Int      // 1-5
+  user       User     @relation(fields: [userId], references: [id])
+  resource   Resource @relation(fields: [resourceId], references: [id])
+  createdAt  DateTime @default(now())
+
+  @@unique([userId, resourceId]) // one rating per user per resource
+  @@index([userId])
+}
