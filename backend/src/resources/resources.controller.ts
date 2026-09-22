@@ -11,6 +11,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ResourcesService } from './resources.service';
 import { CreateResourceDto } from './dto/create-resource.dto';
 import { RateResourceDto } from './dto/rate-resource.dto';
+import type { Request } from 'express';
 
 @Controller('resources')
 @UseGuards(JwtAuthGuard)
@@ -18,8 +19,8 @@ export class ResourcesController {
   constructor(private resourcesService: ResourcesService) {}
 
   @Post()
-  create(@Req() req: any, @Body() dto: CreateResourceDto) {
-    return this.resourcesService.create(req.user.userId, dto);
+  create(@Req() req: Request, @Body() dto: CreateResourceDto) {
+    return this.resourcesService.create(req.user!.userId, dto);
   }
 
   @Get()
@@ -34,10 +35,10 @@ export class ResourcesController {
 
   @Post(':id/rate')
   rate(
-    @Req() req: any,
+    @Req() req: Request,
     @Param('id') id: string,
     @Body() dto: RateResourceDto,
   ) {
-    return this.resourcesService.rate(req.user.userId, id, dto);
+    return this.resourcesService.rate(req.user!.userId, id, dto);
   }
 }

@@ -2,6 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { RecommendationsService } from './recommendations.service';
 import { PrismaService } from '../prisma/prisma.service';
 
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+
 describe('RecommendationsService', () => {
   let service: RecommendationsService;
   let prisma: {
@@ -16,7 +18,10 @@ describe('RecommendationsService', () => {
     };
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [RecommendationsService, { provide: PrismaService, useValue: prisma }],
+      providers: [
+        RecommendationsService,
+        { provide: PrismaService, useValue: prisma },
+      ],
     }).compile();
 
     service = module.get(RecommendationsService);
@@ -34,7 +39,9 @@ describe('RecommendationsService', () => {
 
       const result = await service.getForUser('user1');
 
-      expect(result).toEqual([{ id: 'r1', title: 'Popular', _count: { ratings: 10 } }]);
+      expect(result).toEqual([
+        { id: 'r1', title: 'Popular', _count: { ratings: 10 } },
+      ]);
       expect(prisma.resource.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           orderBy: { ratings: { _count: 'desc' } },

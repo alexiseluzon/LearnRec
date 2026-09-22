@@ -32,9 +32,7 @@ export class RecommendationsService {
       return this.getFallbackPopular(excludeIds);
     }
 
-    const likedTags = new Set(
-      likedRatings.flatMap((r) => r.resource.tags),
-    );
+    const likedTags = new Set(likedRatings.flatMap((r) => r.resource.tags));
 
     const candidates = await this.prisma.resource.findMany({
       where: {

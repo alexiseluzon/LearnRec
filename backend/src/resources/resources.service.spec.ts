@@ -3,6 +3,8 @@ import { NotFoundException } from '@nestjs/common';
 import { ResourcesService } from './resources.service';
 import { PrismaService } from '../prisma/prisma.service';
 
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+
 describe('ResourcesService', () => {
   let service: ResourcesService;
   let prisma: {
@@ -12,12 +14,19 @@ describe('ResourcesService', () => {
 
   beforeEach(async () => {
     prisma = {
-      resource: { create: jest.fn(), findMany: jest.fn(), findUnique: jest.fn() },
+      resource: {
+        create: jest.fn(),
+        findMany: jest.fn(),
+        findUnique: jest.fn(),
+      },
       rating: { upsert: jest.fn() },
     };
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [ResourcesService, { provide: PrismaService, useValue: prisma }],
+      providers: [
+        ResourcesService,
+        { provide: PrismaService, useValue: prisma },
+      ],
     }).compile();
 
     service = module.get(ResourcesService);
@@ -31,7 +40,7 @@ describe('ResourcesService', () => {
       await service.create('user1', {
         title: 'Test',
         url: 'https://example.com',
-        type: 'ARTICLE' as any,
+        type: 'ARTICLE',
         tags: ['js'],
       });
 
@@ -47,7 +56,9 @@ describe('ResourcesService', () => {
     it('throws NotFoundException if resource does not exist', async () => {
       prisma.resource.findUnique.mockResolvedValue(null);
 
-      await expect(service.findOne('missing-id')).rejects.toThrow(NotFoundException);
+      await expect(service.findOne('missing-id')).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it('returns the resource if found', async () => {
@@ -71,7 +82,11 @@ describe('ResourcesService', () => {
 
     it('upserts a rating for an existing resource', async () => {
       prisma.resource.findUnique.mockResolvedValue({ id: 'r1' });
-      prisma.rating.upsert.mockResolvedValue({ userId: 'user1', resourceId: 'r1', score: 5 });
+      prisma.rating.upsert.mockResolvedValue({
+        userId: 'user1',
+        resourceId: 'r1',
+        score: 5,
+      });
 
       const result = await service.rate('user1', 'r1', { score: 5 });
 

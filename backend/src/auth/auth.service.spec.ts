@@ -9,7 +9,11 @@ jest.mock('bcrypt');
 
 describe('AuthService', () => {
   let service: AuthService;
-  let usersService: { findByEmail: jest.Mock; create: jest.Mock; findOrCreateByGoogleId: jest.Mock };
+  let usersService: {
+    findByEmail: jest.Mock;
+    create: jest.Mock;
+    findOrCreateByGoogleId: jest.Mock;
+  };
   let jwtService: { sign: jest.Mock };
 
   beforeEach(async () => {
@@ -41,10 +45,16 @@ describe('AuthService', () => {
       });
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
 
-      const result = await service.login({ email: 'test@test.com', password: 'password123' });
+      const result = await service.login({
+        email: 'test@test.com',
+        password: 'password123',
+      });
 
       expect(result).toEqual({ accessToken: 'signed-jwt-token' });
-      expect(jwtService.sign).toHaveBeenCalledWith({ sub: '1', email: 'test@test.com' });
+      expect(jwtService.sign).toHaveBeenCalledWith({
+        sub: '1',
+        email: 'test@test.com',
+      });
     });
 
     it('throws UnauthorizedException if user not found', async () => {
@@ -56,7 +66,10 @@ describe('AuthService', () => {
     });
 
     it('throws UnauthorizedException if user has no password (OAuth-only account)', async () => {
-      usersService.findByEmail.mockResolvedValue({ id: '1', passwordHash: null });
+      usersService.findByEmail.mockResolvedValue({
+        id: '1',
+        passwordHash: null,
+      });
 
       await expect(
         service.login({ email: 'oauth@test.com', password: 'password123' }),
@@ -64,7 +77,10 @@ describe('AuthService', () => {
     });
 
     it('throws UnauthorizedException if password does not match', async () => {
-      usersService.findByEmail.mockResolvedValue({ id: '1', passwordHash: 'hashed' });
+      usersService.findByEmail.mockResolvedValue({
+        id: '1',
+        passwordHash: 'hashed',
+      });
       (bcrypt.compare as jest.Mock).mockResolvedValue(false);
 
       await expect(

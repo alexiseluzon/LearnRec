@@ -12,6 +12,7 @@ import { AuthService } from './auth.service';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
+import type { Request } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -36,7 +37,13 @@ export class AuthController {
 
   @Get('google/callback')
   @UseGuards(GoogleAuthGuard)
-  googleAuthCallback(@Req() req: any) {
-    return this.authService.loginWithGoogle(req.user);
+  googleAuthCallback(@Req() req: Request) {
+    return this.authService.loginWithGoogle(
+      req.user as {
+        googleId: string;
+        email: string;
+        name: string;
+      },
+    );
   }
 }

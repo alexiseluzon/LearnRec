@@ -4,6 +4,8 @@ import * as bcrypt from 'bcrypt';
 import { UsersService } from './users.service';
 import { PrismaService } from '../prisma/prisma.service';
 
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+
 jest.mock('bcrypt');
 
 describe('UsersService', () => {
@@ -26,10 +28,7 @@ describe('UsersService', () => {
     };
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        UsersService,
-        { provide: PrismaService, useValue: prisma },
-      ],
+      providers: [UsersService, { provide: PrismaService, useValue: prisma }],
     }).compile();
 
     service = module.get(UsersService);
@@ -47,7 +46,11 @@ describe('UsersService', () => {
         createdAt: new Date(),
       });
 
-      const dto = { email: 'test@test.com', password: 'password123', name: 'Test' };
+      const dto = {
+        email: 'test@test.com',
+        password: 'password123',
+        name: 'Test',
+      };
       const result = await service.create(dto);
 
       expect(bcrypt.hash).toHaveBeenCalledWith('password123', 10);
@@ -60,10 +63,17 @@ describe('UsersService', () => {
     });
 
     it('throws ConflictException if email already exists', async () => {
-      prisma.user.findUnique.mockResolvedValue({ id: '1', email: 'test@test.com' });
+      prisma.user.findUnique.mockResolvedValue({
+        id: '1',
+        email: 'test@test.com',
+      });
 
       await expect(
-        service.create({ email: 'test@test.com', password: 'password123', name: 'Test' }),
+        service.create({
+          email: 'test@test.com',
+          password: 'password123',
+          name: 'Test',
+        }),
       ).rejects.toThrow(ConflictException);
       expect(prisma.user.create).not.toHaveBeenCalled();
     });
@@ -71,10 +81,18 @@ describe('UsersService', () => {
 
   describe('findOrCreateByGoogleId', () => {
     it('returns existing user if googleId already linked', async () => {
-      const existingUser = { id: '1', googleId: 'g-123', email: 'test@test.com' };
+      const existingUser = {
+        id: '1',
+        googleId: 'g-123',
+        email: 'test@test.com',
+      };
       prisma.user.findUnique.mockResolvedValueOnce(existingUser); // googleId lookup
 
-      const result = await service.findOrCreateByGoogleId('g-123', 'test@test.com', 'Test');
+      const result = await service.findOrCreateByGoogleId(
+        'g-123',
+        'test@test.com',
+        'Test',
+      );
 
       expect(result).toEqual(existingUser);
       expect(prisma.user.create).not.toHaveBeenCalled();
@@ -86,7 +104,11 @@ describe('UsersService', () => {
         .mockResolvedValueOnce({ id: '1', email: 'test@test.com' }); // existing email account
       prisma.user.update.mockResolvedValue({ id: '1', googleId: 'g-123' });
 
-      const result = await service.findOrCreateByGoogleId('g-123', 'test@test.com', 'Test');
+      const result = await service.findOrCreateByGoogleId(
+        'g-123',
+        'test@test.com',
+        'Test',
+      );
 
       expect(prisma.user.update).toHaveBeenCalledWith({
         where: { id: '1' },
@@ -96,10 +118,20 @@ describe('UsersService', () => {
     });
 
     it('creates a new user if no existing account found', async () => {
-      prisma.user.findUnique.mockResolvedValueOnce(null).mockResolvedValueOnce(null);
-      prisma.user.create.mockResolvedValue({ id: '2', googleId: 'g-456', email: 'new@test.com' });
+      prisma.user.findUnique
+        .mockResolvedValueOnce(null)
+        .mockResolvedValueOnce(null);
+      prisma.user.create.mockResolvedValue({
+        id: '2',
+        googleId: 'g-456',
+        email: 'new@test.com',
+      });
 
-      const result = await service.findOrCreateByGoogleId('g-456', 'new@test.com', 'New');
+      const result = await service.findOrCreateByGoogleId(
+        'g-456',
+        'new@test.com',
+        'New',
+      );
 
       expect(prisma.user.create).toHaveBeenCalledWith({
         data: { googleId: 'g-456', email: 'new@test.com', name: 'New' },

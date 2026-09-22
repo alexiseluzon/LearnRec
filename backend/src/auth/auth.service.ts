@@ -25,7 +25,10 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const passwordMatches = await bcrypt.compare(dto.password, user.passwordHash);
+    const passwordMatches = await bcrypt.compare(
+      dto.password,
+      user.passwordHash,
+    );
     if (!passwordMatches) {
       throw new UnauthorizedException('Invalid credentials');
     }
@@ -33,7 +36,11 @@ export class AuthService {
     return this.issueToken(user.id, user.email);
   }
 
-  async loginWithGoogle(googleUser: { googleId: string; email: string; name: string }) {
+  async loginWithGoogle(googleUser: {
+    googleId: string;
+    email: string;
+    name: string;
+  }) {
     const user = await this.usersService.findOrCreateByGoogleId(
       googleUser.googleId,
       googleUser.email,

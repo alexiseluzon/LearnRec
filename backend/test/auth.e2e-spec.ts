@@ -20,7 +20,11 @@ describe('Auth (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(
-      new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
     );
     await app.init();
 
@@ -40,8 +44,9 @@ describe('Auth (e2e)', () => {
         .send({ email: testEmail, password: testPassword, name: 'E2E Test' })
         .expect(201);
 
-      expect(res.body.accessToken).toBeDefined();
-      expect(typeof res.body.accessToken).toBe('string');
+      const body = res.body as { accessToken: string };
+      expect(body.accessToken).toBeDefined();
+      expect(typeof body.accessToken).toBe('string');
     });
 
     it('rejects duplicate email with 409', async () => {
@@ -61,7 +66,11 @@ describe('Auth (e2e)', () => {
     it('rejects short password with 400', async () => {
       await request(app.getHttpServer())
         .post('/auth/signup')
-        .send({ email: `short-${Date.now()}@test.com`, password: '123', name: 'Test' })
+        .send({
+          email: `short-${Date.now()}@test.com`,
+          password: '123',
+          name: 'Test',
+        })
         .expect(400);
     });
   });
@@ -73,7 +82,8 @@ describe('Auth (e2e)', () => {
         .send({ email: testEmail, password: testPassword })
         .expect(200);
 
-      expect(res.body.accessToken).toBeDefined();
+      const body = res.body as { accessToken: string };
+      expect(body.accessToken).toBeDefined();
     });
 
     it('rejects wrong password with 401', async () => {
@@ -101,7 +111,8 @@ describe('Auth (e2e)', () => {
         .post('/auth/login')
         .send({ email: testEmail, password: testPassword });
 
-      const token = loginRes.body.accessToken;
+      const body = loginRes.body as { accessToken: string };
+      const token = body.accessToken;
 
       await request(app.getHttpServer())
         .get('/resources')
