@@ -1,0 +1,12 @@
+# Editor
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Accidentally created at repo root (each package has its own node_modules)
+/node_modules/
+/package.json
+/package-lock.json
