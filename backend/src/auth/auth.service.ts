@@ -4,9 +4,12 @@ import * as bcrypt from 'bcrypt';
 import { UsersService } from '../users/users.service';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
+import { OAuth2Client } from 'google-auth-library';
 
 @Injectable()
 export class AuthService {
+  private googleClient = new OAuth2Client();
+
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
@@ -52,5 +55,22 @@ export class AuthService {
   private issueToken(userId: string, email: string) {
     const payload = { sub: userId, email };
     return { accessToken: this.jwtService.sign(payload) };
+  }
+
+  async loginWithGoogleIdToken(idToken: string) {
+    const ticket = await this.googleClient.verifyIdToken({
+      idToken,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    const payload = ticket.getPayload();
+    if (!payload?.email || !payload.sub) {
+      throw new UnauthorizedException('Invalid Google token');
+    }
+    const user = await this.usersService.findOrCreateByGoogleId(
+      payload.sub,
+      payload.email,
+      payload.name ?? payload.email,
+    );
+    return this.issueToken(user.id, user.email);
   }
 }
