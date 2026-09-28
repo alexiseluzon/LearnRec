@@ -1,6 +1,8 @@
 import * as SecureStore from 'expo-secure-store';
 import { tokenStorage } from './tokenStorage';
 
+import { Platform } from 'react-native';
+
 jest.mock('expo-secure-store');
 
 describe('tokenStorage', () => {
@@ -52,5 +54,33 @@ describe('tokenStorage', () => {
 
       expect(SecureStore.deleteItemAsync).toHaveBeenCalledWith('learnrec_access_token');
     });
+  });
+});
+
+describe('tokenStorage (web)', () => {
+  const store: Record<string, string> = {};
+
+  beforeEach(() => {
+    jest.resetModules();
+    Object.keys(store).forEach((k) => delete store[k]);
+    Platform.OS = 'web';
+    (globalThis as any).localStorage = {
+      getItem: (k: string) => store[k] ?? null,
+      setItem: (k: string, v: string) => { store[k] = v; },
+      removeItem: (k: string) => { delete store[k]; },
+    };
+  });
+
+  afterEach(() => {
+    Platform.OS = 'ios';
+    delete (globalThis as any).localStorage;
+  });
+
+  it('round-trips a token via localStorage', async () => {
+    const { tokenStorage } = require('./tokenStorage');
+    await tokenStorage.set('web-token');
+    expect(await tokenStorage.get()).toBe('web-token');
+    await tokenStorage.clear();
+    expect(await tokenStorage.get()).toBeNull();
   });
 });

@@ -6,6 +6,7 @@ import React, {
   ReactNode,
 } from 'react';
 import { authApi } from '../api/auth';
+import { signInWithGoogle } from '../api/googleAuth';
 import { tokenStorage } from '../api/tokenStorage';
 import { setUnauthorizedHandler } from '../api/client';
 
@@ -13,6 +14,7 @@ interface AuthContextValue {
   isAuthenticated: boolean;
   isLoading: boolean; // true while checking for a persisted token on app start
   login: (email: string, password: string) => Promise<void>;
+  loginWithGoogle: () => Promise<void>;
   signup: (email: string, password: string, name: string) => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -41,6 +43,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsAuthenticated(true);
   };
 
+  const loginWithGoogle = async () => {
+    const idToken = await signInWithGoogle();
+    if (!idToken) return; // user cancelled
+    const { accessToken } = await authApi.googleLogin(idToken);
+    await tokenStorage.set(accessToken);
+    setIsAuthenticated(true);
+  };
+
   const signup = async (email: string, password: string, name: string) => {
     const { accessToken } = await authApi.signup(email, password, name);
     await tokenStorage.set(accessToken);
@@ -54,7 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated, isLoading, login, signup, logout }}
+      value={{ isAuthenticated, isLoading, login, loginWithGoogle, signup, logout }}
     >
       {children}
     </AuthContext.Provider>

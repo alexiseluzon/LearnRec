@@ -15,10 +15,11 @@ import { useAuth } from '../context/AuthContext';
 type Props = NativeStackScreenProps<AuthStackParamList, 'Login'>;
 
 export default function LoginScreen({ navigation }: Props) {
-  const { login } = useAuth();
+  const { login, loginWithGoogle } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGoogleSubmitting, setIsGoogleSubmitting] = useState(false);
 
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const canSubmit = isEmailValid && password.length >= 8 && !isSubmitting;
@@ -35,6 +36,19 @@ export default function LoginScreen({ navigation }: Props) {
       Alert.alert('Login Error', Array.isArray(message) ? message[0] : message);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    setIsGoogleSubmitting(true);
+    try {
+      await loginWithGoogle();
+    } catch (err: any) {
+      const message =
+        err.response?.data?.message ?? 'Google sign-in failed. Please try again.';
+      Alert.alert('Login Error', Array.isArray(message) ? message[0] : message);
+    } finally {
+      setIsGoogleSubmitting(false);
     }
   };
 
@@ -78,6 +92,26 @@ export default function LoginScreen({ navigation }: Props) {
           <ActivityIndicator color="#fff" />
         ) : (
           <Text style={styles.buttonText}>Log In</Text>
+        )}
+      </TouchableOpacity>
+
+      <View style={styles.dividerRow}>
+        <View style={styles.divider} />
+        <Text style={styles.dividerText}>or</Text>
+        <View style={styles.divider} />
+      </View>
+
+      <TouchableOpacity
+        style={[styles.googleButton, isGoogleSubmitting && styles.buttonDisabled]}
+        onPress={handleGoogleLogin}
+        disabled={isGoogleSubmitting || isSubmitting}
+        accessibilityRole="button"
+        accessibilityLabel="Continue with Google"
+      >
+        {isGoogleSubmitting ? (
+          <ActivityIndicator color="#0f172a" />
+        ) : (
+          <Text style={styles.googleButtonText}>Continue with Google</Text>
         )}
       </TouchableOpacity>
 
@@ -136,6 +170,33 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  dividerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  divider: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#334155',
+  },
+  dividerText: {
+    color: '#94a3b8',
+    fontSize: 13,
+    marginHorizontal: 12,
+  },
+  googleButton: {
+    backgroundColor: '#f8fafc',
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  googleButtonText: {
+    color: '#0f172a',
     fontSize: 16,
     fontWeight: '600',
   },

@@ -3,6 +3,8 @@
     "name": "LearnRec",
     "slug": "learnrec",
     "version": "1.0.0",
+    "scheme": "learnrec",
+    "owner": "lextric",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
@@ -28,6 +30,11 @@
     },
     "plugins": [
       "expo-secure-store"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "4b97bf3b-a907-4131-ae1b-03db3debbd5a"
+      }
+    }
   }
 }
