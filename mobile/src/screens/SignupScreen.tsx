@@ -6,11 +6,11 @@ import {
   TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
-  Alert,
 } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { AuthStackParamList } from '../navigation/types';
 import { useAuth } from '../context/AuthContext';
+import { showAlert } from '../utils/alert';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'Signup'>;
 
@@ -33,7 +33,7 @@ export default function SignupScreen({ navigation }: Props) {
     } catch (err: any) {
       const message =
         err.response?.data?.message ?? 'Signup failed. Please try again.';
-      Alert.alert('Signup Error', Array.isArray(message) ? message[0] : message);
+      showAlert('Signup Error', Array.isArray(message) ? message[0] : message);
     } finally {
       setIsSubmitting(false);
     }

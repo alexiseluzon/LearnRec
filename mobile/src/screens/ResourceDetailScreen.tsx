@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
-  Alert,
   Linking,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
@@ -13,6 +12,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { AppStackParamList } from '../navigation/types';
 import { resourcesApi } from '../api/resources';
 import { Resource } from '../types';
+import { showAlert } from '../utils/alert';
 
 type Props = NativeStackScreenProps<AppStackParamList, 'ResourceDetail'>;
 
@@ -27,7 +27,7 @@ export default function ResourceDetailScreen({ route }: Props) {
       const data = await resourcesApi.getOne(resourceId);
       setResource(data);
     } catch {
-      Alert.alert('Error', 'Could not load this resource.');
+      showAlert('Error', 'Could not load this resource.');
     } finally {
       setIsLoading(false);
     }
@@ -45,7 +45,7 @@ export default function ResourceDetailScreen({ route }: Props) {
       await resourcesApi.rate(resourceId, score);
       await loadResource();
     } catch {
-      Alert.alert('Error', 'Could not save your rating. Please try again.');
+      showAlert('Error', 'Could not save your rating. Please try again.');
     } finally {
       setIsRating(false);
     }

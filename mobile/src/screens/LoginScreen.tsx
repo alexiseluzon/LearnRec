@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   View,
   Text,
@@ -6,11 +6,11 @@ import {
   TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
-  Alert,
 } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { AuthStackParamList } from '../navigation/types';
 import { useAuth } from '../context/AuthContext';
+import { showAlert } from '../utils/alert';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'Login'>;
 
@@ -33,7 +33,7 @@ export default function LoginScreen({ navigation }: Props) {
     } catch (err: any) {
       const message =
         err.response?.data?.message ?? 'Login failed. Please try again.';
-      Alert.alert('Login Error', Array.isArray(message) ? message[0] : message);
+        showAlert('Login Error', Array.isArray(message) ? message[0] : message);
     } finally {
       setIsSubmitting(false);
     }
@@ -46,9 +46,20 @@ export default function LoginScreen({ navigation }: Props) {
     } catch (err: any) {
       const message =
         err.response?.data?.message ?? 'Google sign-in failed. Please try again.';
-      Alert.alert('Login Error', Array.isArray(message) ? message[0] : message);
+        showAlert('Login Error', Array.isArray(message) ? message[0] : message);
     } finally {
       setIsGoogleSubmitting(false);
+    }
+  };
+
+  const handleDemo = async () => {
+    setIsSubmitting(true);
+    try {
+      await login('demo@learnrec.app', 'Demo1234!');
+    } catch {
+      showAlert('Demo unavailable', 'The demo server may be waking up. Try again in 30 seconds.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -101,7 +112,7 @@ export default function LoginScreen({ navigation }: Props) {
         <View style={styles.divider} />
       </View>
 
-      <TouchableOpacity
+      {/* <TouchableOpacity
         style={[styles.googleButton, isGoogleSubmitting && styles.buttonDisabled]}
         onPress={handleGoogleLogin}
         disabled={isGoogleSubmitting || isSubmitting}
@@ -113,6 +124,16 @@ export default function LoginScreen({ navigation }: Props) {
         ) : (
           <Text style={styles.googleButtonText}>Continue with Google</Text>
         )}
+      </TouchableOpacity> */}
+
+      <TouchableOpacity
+        style={styles.demoButton}
+        onPress={handleDemo}
+        disabled={isSubmitting}
+        accessibilityRole="button"
+        accessibilityLabel="Try demo account"
+      >
+        <Text style={styles.demoButtonText}>Try demo account</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
@@ -205,5 +226,18 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 20,
     fontSize: 14,
+  },
+  demoButton: {
+    borderWidth: 1,
+    borderColor: '#6366f1',
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: 'center',
+    marginTop: 12,
+  },
+  demoButtonText: {
+    color: '#818cf8',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });

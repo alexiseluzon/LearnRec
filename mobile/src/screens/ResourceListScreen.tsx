@@ -7,7 +7,6 @@ import {
   StyleSheet,
   ActivityIndicator,
   RefreshControl,
-  Alert,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -15,6 +14,7 @@ import type { AppStackParamList } from '../navigation/types';
 import { resourcesApi } from '../api/resources';
 import { useAuth } from '../context/AuthContext';
 import { Resource } from '../types';
+import { showAlert } from '../utils/alert';
 
 type Props = NativeStackScreenProps<AppStackParamList, 'ResourceList'>;
 
@@ -29,7 +29,7 @@ export default function ResourceListScreen({ navigation }: Props) {
       const data = await resourcesApi.list();
       setResources(data);
     } catch {
-      Alert.alert('Error', 'Could not load resources. Please try again.');
+      showAlert('Error', 'Could not load resources. Please try again.');
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);
@@ -49,7 +49,7 @@ export default function ResourceListScreen({ navigation }: Props) {
   };
 
   const handleLogout = () => {
-    Alert.alert('Log Out', 'Are you sure you want to log out?', [
+    showAlert('Log Out', 'Are you sure you want to log out?', [
       { text: 'Cancel', style: 'cancel' },
       { text: 'Log Out', style: 'destructive', onPress: logout },
     ]);

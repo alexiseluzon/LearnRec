@@ -6,13 +6,13 @@ import {
   TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
-  Alert,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { AppStackParamList } from '../navigation/types';
 import { recommendationsApi } from '../api/recommendations';
 import { Resource } from '../types';
+import { showAlert } from '../utils/alert';
 
 type Props = NativeStackScreenProps<AppStackParamList, 'Recommendations'>;
 
@@ -25,7 +25,7 @@ export default function RecommendationsScreen({ navigation }: Props) {
       const data = await recommendationsApi.getForUser();
       setRecommendations(data);
     } catch {
-      Alert.alert('Error', 'Could not load recommendations.');
+      showAlert('Error', 'Could not load recommendations.');
     } finally {
       setIsLoading(false);
     }

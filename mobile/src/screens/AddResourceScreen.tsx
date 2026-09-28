@@ -6,13 +6,13 @@ import {
   TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
-  Alert,
   ScrollView,
 } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { AppStackParamList } from '../navigation/types';
 import { resourcesApi } from '../api/resources';
 import { ResourceType } from '../types';
+import { showAlert } from '../utils/alert';
 
 type Props = NativeStackScreenProps<AppStackParamList, 'AddResource'>;
 
@@ -41,7 +41,7 @@ export default function AddResourceScreen({ navigation }: Props) {
     } catch (err: any) {
       const message =
         err.response?.data?.message ?? 'Could not add resource. Please try again.';
-      Alert.alert('Error', Array.isArray(message) ? message[0] : message);
+      showAlert('Error', Array.isArray(message) ? message[0] : message);
     } finally {
       setIsSubmitting(false);
     }
