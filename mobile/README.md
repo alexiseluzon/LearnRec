@@ -8,6 +8,7 @@ React Native (Expo) app for LearnRec — browse, save, and rate learning resourc
 - **Navigation:** React Navigation (native stack)
 - **HTTP:** Axios with auth interceptors
 - **Secure storage:** expo-secure-store (Keychain / EncryptedSharedPreferences — not AsyncStorage)
+- **Web:** react-native-web, exported as a static SPA (`localStorage` token fallback)
 
 ## Requirements
 
@@ -35,6 +36,15 @@ Find your LAN IP with `ipconfig` (Windows) — do **not** use `localhost`, since
 Make sure the [backend](../backend) is running and listening on `0.0.0.0` (not just `localhost`) so your phone can reach it.
 
 ### 3. Start the dev server
+
+## Web build
+
+```powershell
+npx expo export -p web
+npx serve dist
+```
+
+Deployed on Vercel with Root Directory `mobile` and env var `EXPO_PUBLIC_API_URL` pointing to the API. `vercel.json` handles SPA rewrites.
 
 ```powershell
 npx expo start
@@ -64,6 +74,7 @@ src/
 - Placeholder app icons/splash in `assets/` — swap with real branding before a public release
 - Google OAuth login is wired on the backend but not yet added as a UI button here
 - `metro.config.js` uses Expo's default config — required for Expo-specific asset/resolver behavior
+- On web, `Alert.alert` is a no-op, so screens use `showAlert` (`src/utils/alert.ts`) instead
 
 ## License
 

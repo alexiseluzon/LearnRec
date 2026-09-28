@@ -89,6 +89,14 @@ src/
 └── prisma/           # Prisma client wrapper (global module)
 ```
 
+## Deployment (Render)
+
+- Root Directory: `backend`
+- Build: `npm ci --include=dev && npx prisma generate && npx prisma migrate deploy && npm run build`
+- Start: `npm run start:prod`
+- Health check: `/health`
+- Required env vars: `DATABASE_URL`, `JWT_SECRET`, `CORS_ORIGIN`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_CALLBACK_URL`
+
 ## License
 
 This project is for portfolio/demonstration purposes. No warranty; use at your own risk.
